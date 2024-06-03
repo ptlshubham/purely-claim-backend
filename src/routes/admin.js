@@ -27,6 +27,140 @@ const job = schedule.scheduleJob("0 0 * * *", function () {
   );
 });
 
+router.post("/SaveFacilityType", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("INSERT INTO `facilitytype`(`name`, `isactive`, `createddate`) VALUES('" + req.body.name + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+});
+
+router.get("/GetAllServices", (req, res, next) => {
+  db.executeSql("SELECT * FROM `facilitytype`;", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
+router.get("/RemoveFacilityType/:id", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql(
+    "Delete from `facilitytype` where id=" + req.params.id,
+    function (data, err) {
+      if (err) {
+        console.log("Error in store.js", err);
+      } else {
+        return res.json(data);
+      }
+    }
+  );
+});
+
+router.post("/SaveSpeciality", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("INSERT INTO `speciality`(`isactive`, `specialityname`, `taxonomycode`, `detail`, `notes`, `createdate`) VALUES (" + req.body.Nactive + ",'" + req.body.name + "','" + req.body.code + "','"+ req.body.detail +"','"+ req.body.notes +"',"+  ",CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+});
+
+router.get("/GetAllSpecialityDetails", (req, res, next) => {
+  db.executeSql("SELECT * FROM `speciality`;", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 router.post("/SaveServicesList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "servecies");
   db.executeSql("INSERT INTO `serviceslist`(`salonid`,`name`, `price`,`totalcost`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES(" + req.body.salonid + ",'" + req.body.name + "'," + req.body.price + "," + req.body.totalcost + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
