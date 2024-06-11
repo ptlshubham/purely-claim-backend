@@ -65,7 +65,7 @@ router.get("/RemoveFacilityType/:id", (req, res, next) => {
 
 router.post("/SaveSpeciality", (req, res, next) => {
   console.log(req.body);
-  db.executeSql("INSERT INTO `speciality`(`isactive`, `specialityname`, `taxonomycode`, `detail`, `notes`, `createdate`) VALUES (" + req.body.Nactive + ",'" + req.body.name + "','" + req.body.code + "','"+ req.body.detail +"','"+ req.body.notes +"',"+  ",CURRENT_TIMESTAMP);", function (data, err) {
+  db.executeSql("INSERT INTO `speciality`(`isactive`, `specialityname`, `taxonomycode`, `detail`, `notes`, `createdate`) VALUES (true,'" + req.body.specialityname + "','" + req.body.code + "','" + req.body.detail + "','" + req.body.notes + "',CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       res.json("error");
     } else {
@@ -76,7 +76,7 @@ router.post("/SaveSpeciality", (req, res, next) => {
 });
 
 router.get("/GetAllSpecialityDetails", (req, res, next) => {
-  db.executeSql("SELECT * FROM `speciality`;", function (data, err) {
+  db.executeSql("SELECT * FROM `speciality`", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -85,8 +85,16 @@ router.get("/GetAllSpecialityDetails", (req, res, next) => {
   });
 });
 
-
-
+router.get("/RemoveSpecialtyDetails/:id", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("Delete from `speciality` where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
 
 
 
