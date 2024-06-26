@@ -26,7 +26,64 @@ const job = schedule.scheduleJob("0 0 * * *", function () {
   }
   );
 });
+let secret = 'prnv';
+router.post("/LoginOrganizationUser", (req, res, next) => {
+  const body = req.body;
+  console.log(body);
+  var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
+  var repass = salt + "" + body.password;
+  var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
+  db.executeSql("select * from admin where email='" + req.body.email + "';", function (data, err) {
+    if (data.length > 0) {
+      db.executeSql("select * from admin where email='" + req.body.email + "' and password='" + encPassword + "';", function (data1, err) {
+        console.log(data1);
+        if (data1.length > 0) {
+          module.exports.user1 = {
+            username: data1[0].email,
+            password: data1[0].password,
+          };
+          let token = jwt.sign(
+            { username: data1[0].email, password: data1[0].password },
+            secret,
+            {
+              expiresIn: "1h", // expires in 24 hours
+            }
+          );
+          console.log("token=", token);
+          data[0].token = token;
 
+          res.cookie("auth", token);
+          res.json(data);
+        } else {
+          return res.json(2);
+        }
+      }
+      );
+    } else {
+      return res.json(1);
+    }
+  }
+  );
+});
+router.post("/SaveRegistartion", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("INSERT INTO `registration`(`firstname`, `lastname`, `email`,`contact`,`speciality`,`createddate`) VALUES('" + req.body.firstname + "','" + req.body.lastname + "','" + req.body.email + "'," + req.body.contact + ",'" + req.body.speciality + "',CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    }
+  }
+  );
+});
+
+router.get("/GetAllRegisrationList", (req, res, next) => {
+  db.executeSql("SELECT * FROM `registration`", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
 router.post("/SaveFacilityType", (req, res, next) => {
   console.log(req.body);
   db.executeSql("INSERT INTO `facilitytype`(`name`, `isactive`, `createddate`) VALUES('" + req.body.name + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
@@ -97,19 +154,109 @@ router.get("/RemoveSpecialtyDetails/:id", (req, res, next) => {
 });
 
 
+router.post("/UploadPrimaryFacilityImage", (req, res, next) => {
+  var imgname = generateUUID();
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "images/primaryfacilityimg");
+
+    },
+    // By default, multer removes file extensions so let's add them back
+    filename: function (req, file, cb) {
+      cb(null, imgname + path.extname(file.originalname));
+    },
+  });
+  let upload = multer({ storage: storage }).single
+    ("file");
+  upload(req, res, function (err) {
+
+    console.log("path=", config.url + "images/primaryfacilityimg/" + req.file.filename);
+
+    if (req.fileValidationError) {
+      console.log("err1", req.fileValidationError);
+      return res.json("err1", req.fileValidationError);
+    } else if (!req.file) {
+      console.log("Please select an image to upload");
+      return res.json("Please select an image to upload");
+    } else if (err instanceof multer.MulterError) {
+      console.log("err3");
+      return res.json("err3", err);
+    } else if (err) {
+      console.log("err4");
+      return res.json("err4", err);
+    }
+    return res.json("/images/primaryfacilityimg/" + req.file.filename);
+
+  });
+});
 
 
 
 
+router.post("/SavePrimaryFacility", (req, res, next) => {
+  console.log(req.body, 'Hii I am facility')
+  db.executeSql("INSERT INTO `primaryfacility`(`name`, `timezone`, `npi`, `pos`, `speciaity`, `taxid`, `email`, `contact`, `facilityimage`, `country`, `state`, `city`, `address`, `postalcode`, `createddate`) VALUES ('" + req.body.name + "','" + req.body.timezone + "'," + req.body.npi + ",'" + req.body.pos + "','" + req.body.speciaity + "'," + req.body.taxid + ",'" + req.body.email + "'," + req.body.contact + ",'" + req.body.facilityimage + "','" + req.body.country + "','" + req.body.state + "','" + req.body.city + "','" + req.body.address + "','" + req.body.postalcode + "',CURRENT_TIMESTAMP)", function (data, err) {
+    if (err) {
+      res.json("error");
+      console.log(err)
+    } else {
 
+      console.log(data, 'Response')
+      return res.json(data);
+    }
+  });
+});
+// router.post("/SendApprovalEmail", (req, res, next) => {
+//   console.log(req.body)
+//   const clientId = req.body.salonid; // get the client ID from the request body
+//   const clientEmail = req.body.email; // get the client email from the request body
 
+//   // retrieve the client data from the database
+//   db.query("SELECT * FROM `registration` WHERE `id` =?", clientId, (err, rows) => {
+//     if (err) {
+//       console.log(err);
+//       res.json("Error");
+//     } else {
+//       const clientData = rows[0]; // assume the client data is in the first row
+//       // create the email template data
+//       const emailData = {
+//         name: clientData.name,
+//         email: clientData.email,
+//         // add other relevant data from the clientData object
+//       };
+//       // send the email using Nodemailer
+//       const transporter = nodemailer.createTransport({
+//         service: "gmail",
+//         host: 'mtp.gmail.com',
+//         auth: {
+//           user: 'fostermarketing98@gmail.com',
+//           pass: 'kdyxsujdvlhhjfww'
+//         },
+//       });
+//       const filePath = 'rc/assets/emailtemplets/appointment-confirmation.hbs';
+//       const source = fs.readFileSync(filePath, 'utf-8').toString();
+//       const template = handlebars.compile(source);
+//       const htmlToSend = template(emailData);
 
+//       const mailOptions = {
+//         from: `"Het" <fostermarketing98@gmail.com>`, // Replace with your name and Hostinger email
+//         subject: "Your Registration has been Approved",
+//         to: clientEmail,
+//         html: htmlToSend,
+//       };
 
-
-
-
-
-
+//       transporter.sendMail(mailOptions, function (error, info) {
+//         if (error) {
+//           console.log(error);
+//           res.json("Error sending email");
+//         } else {
+//           console.log(`Email sent: ${info.response}`);
+//           res.json("Email sent successfully");
+//         }
+//       });
+//     }
+//   });
+// });
 
 
 
@@ -3005,6 +3152,8 @@ router.post("/SaveBulkServiceDetails", (req, res, next) => {
   }
   // console.log(data);
 });
+
+
 
 function generateUUID() {
   var d = new Date().getTime();
