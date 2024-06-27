@@ -65,6 +65,44 @@ router.post("/LoginOrganizationUser", (req, res, next) => {
   }
   );
 });
+router.post("/UserLogin", (req, res, next) => {
+  const body = req.body;
+  console.log(body);
+  // var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
+  // var repass = salt + "" + body.password;
+  // var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
+  db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
+    if (data.length > 0) {
+      db.executeSql("select * from users where email='" + req.body.email + "' and password='" + req.body.password + "';", function (data1, err) {
+        console.log(data1);
+        if (data1.length > 0) {
+          module.exports.user1 = {
+            username: data1[0].email,
+            password: data1[0].password,
+          };
+          let token = jwt.sign(
+            { username: data1[0].email, password: data1[0].password },
+            secret,
+            {
+              expiresIn: "1h", // expires in 24 hours
+            }
+          );
+          console.log("token=", token);
+          data[0].token = token;
+
+          res.cookie("auth", token);
+          res.json(data);
+        } else {
+          return res.json(2);
+        }
+      }
+      );
+    } else {
+      return res.json(1);
+    }
+  }
+  );
+});
 router.post("/SaveRegistartion", (req, res, next) => {
   console.log(req.body);
   db.executeSql("INSERT INTO `registration`(`firstname`, `lastname`, `email`,`contact`,`speciality`,`createddate`) VALUES('" + req.body.firstname + "','" + req.body.lastname + "','" + req.body.email + "'," + req.body.contact + ",'" + req.body.speciality + "',CURRENT_TIMESTAMP);", function (data, err) {
@@ -96,6 +134,15 @@ router.post("/SaveFacilityType", (req, res, next) => {
   );
 });
 
+router.post("/SaveRegistartion", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("INSERT INTO `registration`(`firstname`, `lastname`, `email`,`contact`,`speciality`,`createddate`) VALUES('" + req.body.firstname + "','" + req.body.lastname + "','" + req.body.email + "'," + req.body.contact + ",'" + req.body.speciality + "',CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    }
+  }
+  );
+});
 router.get("/GetAllServices", (req, res, next) => {
   db.executeSql("SELECT * FROM `facilitytype`;", function (data, err) {
     if (err) {
@@ -200,12 +247,59 @@ router.post("/SavePrimaryFacility", (req, res, next) => {
       res.json("error");
       console.log(err)
     } else {
-
       console.log(data, 'Response')
       return res.json(data);
     }
   });
 });
+router.post("/SaveUserDetailes", (req, res, next) => {
+  console.log(req.body, 'Hii I am facility')
+  db.executeSql("INSERT INTO `users`( `clinicid`, `email`, `password`, `role`, `isactive`, `status`, `in_time`, `out_time`) VALUES (" + req.body.clinicId + ",'" + req.body.email + "','" + req.body.password + "','" + req.body.role + "',true,true,null,null)", function (data, err) {
+    if (err) {
+      res.json("error");
+      console.log(err)
+    } else {
+      console.log(data, 'Response')
+      return res.json(data);
+    }
+  });
+});
+
+
+
+// function companymail(filename, data, toemail, subj, mailname) {
+//   const transporter = nodemailer.createTransport({
+//       service: "gmail",
+//       host: 'smtp.gmail.com',
+//       auth: {
+//           user: 'fostermarketing98@gmail.com',
+//           pass: 'kdyxsujdvlhhjfww'
+//       },
+//   });
+//   const filePath = 'src/assets/emailtemplets/appoinment-confirmation' + filename;
+//   const source = fs.readFileSync(filePath, 'utf-8').toString();
+//   const template = handlebars.compile(source);
+//   const replacements = data;
+//   const htmlToSend = template(replacements);
+//   const mailOptions = {
+//       from: `"Foster" <fostermarketing98@gmail.com>`, // Replace with your name and Hostinger email
+//       subject: subj,
+//       to: toemail,
+//       Name: mailname,
+//       html: htmlToSend,
+//   };
+//   transporter.sendMail(mailOptions, function (error, info) {
+//       if (error) {
+//           console.log(error);
+//           res.json("Errror");
+//       } else {
+//           console.log('Email sent: ' + info.response);
+//           res.json(data);
+//       }
+//   });
+// }
+
+
 // router.post("/SendApprovalEmail", (req, res, next) => {
 //   console.log(req.body)
 //   const clientId = req.body.salonid; // get the client ID from the request body
