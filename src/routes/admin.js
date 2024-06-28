@@ -260,6 +260,15 @@ router.post("/SaveUserDetailes", (req, res, next) => {
       console.log(err)
     } else {
       console.log(data, 'Response')
+
+      // Send email using companymail function
+      const filename = '.html'; // adjust the filename as needed
+      const dataToSend = { /* data to be replaced in the email template */ };
+      const toEmail = req.body.email;
+      const subj = 'Account Created Successfully';
+      const mailname = 'Foster';
+      companymail(filename, dataToSend, toEmail, subj, mailname);
+
       return res.json(data);
     }
   });
@@ -267,37 +276,38 @@ router.post("/SaveUserDetailes", (req, res, next) => {
 
 
 
-// function companymail(filename, data, toemail, subj, mailname) {
-//   const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       host: 'smtp.gmail.com',
-//       auth: {
-//           user: 'fostermarketing98@gmail.com',
-//           pass: 'kdyxsujdvlhhjfww'
-//       },
-//   });
-//   const filePath = 'src/assets/emailtemplets/appoinment-confirmation' + filename;
-//   const source = fs.readFileSync(filePath, 'utf-8').toString();
-//   const template = handlebars.compile(source);
-//   const replacements = data;
-//   const htmlToSend = template(replacements);
-//   const mailOptions = {
-//       from: `"Foster" <fostermarketing98@gmail.com>`, // Replace with your name and Hostinger email
-//       subject: subj,
-//       to: toemail,
-//       Name: mailname,
-//       html: htmlToSend,
-//   };
-//   transporter.sendMail(mailOptions, function (error, info) {
-//       if (error) {
-//           console.log(error);
-//           res.json("Errror");
-//       } else {
-//           console.log('Email sent: ' + info.response);
-//           res.json(data);
-//       }
-//   });
-// }
+
+function companymail(filename, data, toemail, subj, mailname) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: 'smtp.gmail.com',
+    auth: {
+      user: 'fostermarketing98@gmail.com',
+      pass: 'kdyxsujdvlhhjfww'
+    },
+  });
+  const filePath = 'src/assets/emailtemplets/facility-confirmation' + filename;
+  const source = fs.readFileSync(filePath, 'utf-8').toString();
+  const template = handlebars.compile(source);
+  const replacements = data;
+  const htmlToSend = template(replacements);
+  const mailOptions = {
+    from: `"Foster" <fostermarketing98@gmail.com>`, // Replace with your name and Hostinger email
+    subject: subj,
+    to: toemail,
+    Name: mailname,
+    html: htmlToSend,
+  };
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      res.json("Errror");
+    } else {
+      console.log('Email sent: ' + info.response);
+      res.json(data);
+    }
+  });
+}
 
 
 // router.post("/SendApprovalEmail", (req, res, next) => {
