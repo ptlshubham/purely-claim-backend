@@ -312,58 +312,6 @@ function companymail(filename, data, toemail, subj, mailname) {
 }
 
 
-// router.post("/SendApprovalEmail", (req, res, next) => {
-//   console.log(req.body)
-//   const clientId = req.body.salonid; // get the client ID from the request body
-//   const clientEmail = req.body.email; // get the client email from the request body
-
-//   // retrieve the client data from the database
-//   db.query("SELECT * FROM `registration` WHERE `id` =?", clientId, (err, rows) => {
-//     if (err) {
-//       console.log(err);
-//       res.json("Error");
-//     } else {
-//       const clientData = rows[0]; // assume the client data is in the first row
-//       // create the email template data
-//       const emailData = {
-//         name: clientData.name,
-//         email: clientData.email,
-//         // add other relevant data from the clientData object
-//       };
-//       // send the email using Nodemailer
-//       const transporter = nodemailer.createTransport({
-//         service: "gmail",
-//         host: 'mtp.gmail.com',
-//         auth: {
-//           user: 'fostermarketing98@gmail.com',
-//           pass: 'kdyxsujdvlhhjfww'
-//         },
-//       });
-//       const filePath = 'rc/assets/emailtemplets/appointment-confirmation.hbs';
-//       const source = fs.readFileSync(filePath, 'utf-8').toString();
-//       const template = handlebars.compile(source);
-//       const htmlToSend = template(emailData);
-
-//       const mailOptions = {
-//         from: `"Het" <fostermarketing98@gmail.com>`, // Replace with your name and Hostinger email
-//         subject: "Your Registration has been Approved",
-//         to: clientEmail,
-//         html: htmlToSend,
-//       };
-
-//       transporter.sendMail(mailOptions, function (error, info) {
-//         if (error) {
-//           console.log(error);
-//           res.json("Error sending email");
-//         } else {
-//           console.log(`Email sent: ${info.response}`);
-//           res.json("Email sent successfully");
-//         }
-//       });
-//     }
-//   });
-// });
-
 
 
 
