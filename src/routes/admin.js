@@ -263,7 +263,9 @@ router.post("/SaveUserDetailes", (req, res, next) => {
 
       // Send email using companymail function
       const filename = '.html'; // adjust the filename as needed
-      const dataToSend = { /* data to be replaced in the email template */ };
+      const dataToSend = {
+        name: req.body.name,/* data to be replaced in the email template */
+      };
       const toEmail = req.body.email;
       const subj = 'Account Created Successfully';
       const mailname = 'Foster';
@@ -286,7 +288,7 @@ function companymail(filename, data, toemail, subj, mailname) {
       pass: 'kdyxsujdvlhhjfww'
     },
   });
-  const filePath = 'src/assets/emailtemplets/facility-confirmation' + filename;
+  const filePath = 'src/assets/emailtemplets/facility-confirmtion' + filename;
   const source = fs.readFileSync(filePath, 'utf-8').toString();
   const template = handlebars.compile(source);
   const replacements = data;
