@@ -134,15 +134,7 @@ router.post("/SaveFacilityType", (req, res, next) => {
   );
 });
 
-router.post("/SaveRegistartion", (req, res, next) => {
-  console.log(req.body);
-  db.executeSql("INSERT INTO `registration`(`firstname`, `lastname`, `email`,`contact`,`speciality`,`createddate`) VALUES('" + req.body.firstname + "','" + req.body.lastname + "','" + req.body.email + "'," + req.body.contact + ",'" + req.body.speciality + "',CURRENT_TIMESTAMP);", function (data, err) {
-    if (err) {
-      res.json("error");
-    }
-  }
-  );
-});
+
 router.get("/GetAllServices", (req, res, next) => {
   db.executeSql("SELECT * FROM `facilitytype`;", function (data, err) {
     if (err) {
@@ -216,9 +208,7 @@ router.post("/UploadPrimaryFacilityImage", (req, res, next) => {
   let upload = multer({ storage: storage }).single
     ("file");
   upload(req, res, function (err) {
-
     console.log("path=", config.url + "images/primaryfacilityimg/" + req.file.filename);
-
     if (req.fileValidationError) {
       console.log("err1", req.fileValidationError);
       return res.json("err1", req.fileValidationError);
@@ -236,10 +226,6 @@ router.post("/UploadPrimaryFacilityImage", (req, res, next) => {
 
   });
 });
-
-
-
-
 router.post("/SavePrimaryFacility", (req, res, next) => {
   console.log(req.body, 'Hii I am facility')
   db.executeSql("INSERT INTO `primaryfacility`(`name`, `timezone`, `npi`, `pos`, `speciaity`, `taxid`, `email`, `contact`, `facilityimage`, `country`, `state`, `city`, `address`, `postalcode`, `createddate`) VALUES ('" + req.body.name + "','" + req.body.timezone + "'," + req.body.npi + ",'" + req.body.pos + "','" + req.body.speciaity + "'," + req.body.taxid + ",'" + req.body.email + "'," + req.body.contact + ",'" + req.body.facilityimage + "','" + req.body.country + "','" + req.body.state + "','" + req.body.city + "','" + req.body.address + "','" + req.body.postalcode + "',CURRENT_TIMESTAMP)", function (data, err) {
@@ -252,9 +238,19 @@ router.post("/SavePrimaryFacility", (req, res, next) => {
     }
   });
 });
+
+router.post("/SaveRegistartion", (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("INSERT INTO `registration`(`firstname`, `lastname`, `email`,`contact`,`speciality`,`createddate`) VALUES('" + req.body.firstname + "','" + req.body.lastname + "','" + req.body.email + "'," + req.body.contact + ",'" + req.body.speciality + "',CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    }
+  }
+  );
+});
 router.post("/SaveUserDetailes", (req, res, next) => {
   console.log(req.body, 'Hii I am facility')
-  db.executeSql("INSERT INTO `users`( `clinicid`, `email`, `password`, `role`, `isactive`, `status`, `in_time`, `out_time`) VALUES (" + req.body.clinicId + ",'" + req.body.email + "','" + req.body.password + "','" + req.body.role + "',true,true,null,null)", function (data, err) {
+  db.executeSql("INSERT INTO `users`( `clinicid`, `firstname`, `lastname`,`email`, `password`, `role`, `isactive`, `status`, `in_time`, `out_time`) VALUES (" + req.body.clinicId + ",'" + req.body.firstname + "','" + req.body.lastname + "','" + req.body.email + "','" + req.body.password + "','" + req.body.role + "',true,true,null,null)", function (data, err) {
     if (err) {
       res.json("error");
       console.log(err)
@@ -264,7 +260,9 @@ router.post("/SaveUserDetailes", (req, res, next) => {
       // Send email using companymail function
       const filename = '.html'; // adjust the filename as needed
       const dataToSend = {
-        name: req.body.name,/* data to be replaced in the email template */
+        name: req.body.firstname + ' ' + req.body.lastname,
+
+        /* data to be replaced in the email template */
       };
       const toEmail = req.body.email;
       const subj = 'Account Created Successfully';
