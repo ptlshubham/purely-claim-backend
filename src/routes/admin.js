@@ -135,7 +135,7 @@ router.post("/SaveFacilityType", (req, res, next) => {
 });
 
 
-router.get("/GetAllServices", (req, res, next) => {
+router.get("/GetAllFacility", (req, res, next) => {
   db.executeSql("SELECT * FROM `facilitytype`;", function (data, err) {
     if (err) {
       console.log(err);
@@ -228,7 +228,7 @@ router.post("/UploadPrimaryFacilityImage", (req, res, next) => {
 });
 router.post("/SavePrimaryFacility", (req, res, next) => {
   console.log(req.body, 'Hii I am facility')
-  db.executeSql("INSERT INTO `primaryfacility`(`name`, `timezone`, `npi`, `pos`, `speciaity`, `taxid`, `email`, `contact`, `facilityimage`, `country`, `state`, `city`, `address`, `postalcode`, `createddate`) VALUES ('" + req.body.name + "','" + req.body.timezone + "'," + req.body.npi + ",'" + req.body.pos + "','" + req.body.speciaity + "'," + req.body.taxid + ",'" + req.body.email + "'," + req.body.contact + ",'" + req.body.facilityimage + "','" + req.body.country + "','" + req.body.state + "','" + req.body.city + "','" + req.body.address + "','" + req.body.postalcode + "',CURRENT_TIMESTAMP)", function (data, err) {
+  db.executeSql("INSERT INTO `primaryfacility`(`userid`,`clinicid`,`name`, `timezone`, `npi`, `pos`, `speciaity`,`facilitytype`, `taxid`, `email`, `contact`, `facilityimage`, `country`, `state`, `city`, `address`, `postalcode`, `createddate`) VALUES (" + req.body.userid + "," + req.body.clinicid + ",'" + req.body.name + "','" + req.body.timezone + "'," + req.body.npi + ",'" + req.body.pos + "','" + req.body.speciaity + "','" + req.body.facilitytype + "'," + req.body.taxid + ",'" + req.body.email + "'," + req.body.contact + ",'" + req.body.facilityimage + "','" + req.body.country + "','" + req.body.state + "','" + req.body.city + "','" + req.body.address + "','" + req.body.postalcode + "',CURRENT_TIMESTAMP)", function (data, err) {
     if (err) {
       res.json("error");
       console.log(err)
@@ -238,6 +238,18 @@ router.post("/SavePrimaryFacility", (req, res, next) => {
     }
   });
 });
+
+
+router.get("/GetPrimaryFacility", (req, res, next) => {
+  db.executeSql("SELECT * FROM `primaryfacility`", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
 
 router.post("/SaveRegistartion", (req, res, next) => {
   console.log(req.body);
@@ -256,13 +268,10 @@ router.post("/SaveUserDetailes", (req, res, next) => {
       console.log(err)
     } else {
       console.log(data, 'Response')
-
-      // Send email using companymail function
       const filename = '.html'; // adjust the filename as needed
       const dataToSend = {
         name: req.body.firstname + ' ' + req.body.lastname,
 
-        /* data to be replaced in the email template */
       };
       const toEmail = req.body.email;
       const subj = 'Account Created Successfully';
@@ -308,6 +317,7 @@ function companymail(filename, data, toemail, subj, mailname) {
     }
   });
 }
+
 
 
 
